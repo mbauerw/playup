@@ -1,0 +1,36 @@
+header {
+    border: 4px ridge black;
+    border-radius: 30px;
+    min-height: 15vh;
+    background-color: rgb(53, 110, 202);
+}
+
+body header h1{
+    font-size: 4em;
+    font-family: serif;
+    text-align: center;
+}
+
+
+#button-holder{
+    min-height: 10vh;
+    border: 2px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+}
+
+#dataButton {
+    background-color: darkviolet;
+    font-size: 1.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+}
+
+#dataButton:hover{
+    border-color: #646cff;
+    background-color: blue;
+
+}
