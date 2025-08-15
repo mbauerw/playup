@@ -1,5 +1,8 @@
-const clientId = "fcc754186cae434197475f0ea29ac7c4"; // Replace with your client id
-const clientSecret = "d4b6643e62214511b85925f86be11939";
+import dotenv from 'dotenv';
+dotenv.config();
+
+const clientId = process.env.clientId ; // Replace with your client id
+const clientSecret =  ;
 
 
 
