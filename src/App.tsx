@@ -32,21 +32,6 @@ function App() {
   const {profile, fetchProfile} = useGetProfile(token);
 
 
-
-  // get token
-  // useEffect(() => {
-  //   const handleGetToken = async () => {
-  //     try {
-  //       getToken();
-  //       console.log('token stored');
-  //     } catch (tokError) {
-  //       console.error('failed to get token', tokError);
-  //     }
-  //   };
-
-  //   handleGetToken(); // Actually call the function!
-  // }, [getToken]); // Add getToken to dependencies
-
   const handleClearToken = () => {
     clearToken();
   };

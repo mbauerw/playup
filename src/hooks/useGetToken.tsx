@@ -1,10 +1,5 @@
 import {useState, useEffect, useCallback} from 'react';
-
-interface SpotifyTokenResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-}
+import type { SpotifyTokenResponse } from '../types/spotify';
 
 function useGetToken(code: string) {
   const [token, setToken] = useState<string | null>(null);
