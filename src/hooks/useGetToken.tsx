@@ -1,5 +1,6 @@
 import {useState, useEffect, useCallback} from 'react';
-import type { SpotifyTokenResponse } from '../types/spotify';
+import type { SpotifyTokenResponse } from '../types/auth';
+import { getSpotifyToken } from '../services/getToken';
 
 function useGetToken(code: string) {
   const [token, setToken] = useState<string | null>(null);
@@ -11,37 +12,20 @@ function useGetToken(code: string) {
   console.log("Verifier is here: " + verifier);
   
 
-  const getToken = useCallback(async (): Promise<[string]> => {
+  const getToken = useCallback(async (): Promise<string>  => {
     setLoading(true);
     setTokError(null);
 
     try {
-      const params = new URLSearchParams();
-      params.append("client_id", import.meta.env.VITE_clientId);
-      params.append("grant_type", "authorization_code");
-      params.append("code", code);
-      params.append("redirect_uri", "http://127.0.0.1:5173/callback");
-      params.append("code_verifier", verifier!);
-
-      console.log('Requesting token...');
-
-      const response = await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: params
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!verifier) {
+        throw new Error('Code verifier not found in localStorage');
       }
-
-      const result: SpotifyTokenResponse = await response.json();
+  
+      const result: SpotifyTokenResponse = await getSpotifyToken(code, verifier);
       setToken(result.access_token);
       
       console.log('Token received successfully!');
-      return [result.access_token];
+      return result.access_token;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to get token';
@@ -51,7 +35,7 @@ function useGetToken(code: string) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [code, verifier]);
 
   const clearToken = useCallback(() => {
     setToken(null);

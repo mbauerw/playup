@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { UsePkceAuthReturn } from '../types/auth';
 
 // Move utility functions outside the hook to prevent recreation
 const generateRandomString = (length: number): string => {
@@ -20,13 +21,7 @@ const base64encode = (input: ArrayBuffer): string => {
     .replace(/\//g, '_');
 };
 
-interface UsePkceAuthReturn {
-  code: string;
-  isLoading: boolean;
-  error: string | null;
-  initiateAuth: () => Promise<void>;
-  clearAuth: () => void;
-}
+
 
 const usePkceAuth = (): UsePkceAuthReturn => {
   const [code, setCode] = useState<string>('');
@@ -37,7 +32,6 @@ const usePkceAuth = (): UsePkceAuthReturn => {
   const redirectUri = 'http://127.0.0.1:5173/callback';
   const scope = 'user-read-private user-read-email playlist-read-private playlist-modify-private user-follow-read';
 
-  // Check for auth code on component mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const authCode = urlParams.get('code');
@@ -47,7 +41,6 @@ const usePkceAuth = (): UsePkceAuthReturn => {
       setError(`Authentication failed: ${authError}`);
     } else if (authCode) {
       setCode(authCode);
-      // Clean up URL parameters
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
@@ -113,62 +106,3 @@ const usePkceAuth = (): UsePkceAuthReturn => {
 };
 
 export default usePkceAuth;
-
-
-// const pkceAuth = () => {
-
-//   const generateRandomString = (length: number) => {
-//     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-//     const values = crypto.getRandomValues(new Uint8Array(length));
-//     return values.reduce((acc, x) => acc + possible[x % possible.length], "");
-//   }
-
-//   const codeVerifier  = generateRandomString(64);
-
-//   const sha256 = async (plain: string): Promise<ArrayBuffer> => {
-//     const encoder = new TextEncoder()
-//     const data = encoder.encode(plain)
-//     return window.crypto.subtle.digest('SHA-256', data)
-//   }
-
-//   const base64encode = (input: ArrayBuffer) => {
-//     return btoa(String.fromCharCode(...new Uint8Array(input)))
-//       .replace(/=/g, '')
-//       .replace(/\+/g, '-')
-//       .replace(/\//g, '_');
-//   }
-
-//   const hashed = await sha256(codeVerifier)
-//   const codeChallenge = base64encode(hashed);
-
-//   const clientId = import.meta.env.VITE_clientId;
-//   const redirectUri = 'http://127.0.0.1:5173';
-
-//   const scope = 'user-read-private user-read-email playlist-read-private playlist-modify-private user-follow-read';
-//   const authUrl = new URL("https://accounts.spotify.com/authorize")
-
-//   // generated in the previous step
-//   window.localStorage.setItem('code_verifier', codeVerifier);
-
-//   const params =  {
-//     response_type: 'code',
-//     client_id: clientId,
-//     scope,
-//     code_challenge_method: 'S256',
-//     code_challenge: codeChallenge,
-//     redirect_uri: redirectUri,
-//   }
-
-//   authUrl.search = new URLSearchParams(params).toString();
-//   window.location.href = authUrl.toString();
-
-//   const urlParams = new URLSearchParams(window.location.search);
-//   let code = urlParams.get('code');
-
-//   console.log("Code is: " + code);
-
-//   return code;
-
-// }
-
-// export default pkceAuth;

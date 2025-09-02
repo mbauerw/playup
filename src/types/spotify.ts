@@ -19,7 +19,7 @@ export interface SpotifyExplicitContent {
   filter_locked: boolean;
 }
 
-export interface SpotifyFollowers {
+export interface Followers {
   href: string | null;
   total: number;
 }
@@ -41,7 +41,7 @@ export interface CurrentUser {
   email: string;
   explicit_content: SpotifyExplicitContent;
   external_urls: SpotifyExternalUrls;
-  followers: SpotifyFollowers;
+  followers: Followers;
   href: string;
   id: string;
   images: SpotifyImage[];
