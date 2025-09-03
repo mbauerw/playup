@@ -46,3 +46,8 @@ export interface CurrentUserPlaylists {
   total: number;
   items: SpotifyPlaylist[];
 }
+
+export interface GetPlaylistsParams {
+  limit?: number;
+  offset?: number;
+}

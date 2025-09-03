@@ -1,35 +1,35 @@
 import {useState, useEffect, useCallback} from 'react';
 import type { SpotifyTokenResponse } from '../types/auth';
-import { getSpotifyToken } from '../services/getToken';
+import {spotifyApi} from '../services/spotifyApi';
+
 
 function useGetToken(code: string) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [tokError, setTokError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const verifier = localStorage.getItem("code_verifier");
 
-  console.log("Verifier is here: " + verifier);
+  //console.log("Verifier is here: " + verifier);
   
 
-  const getToken = useCallback(async (): Promise<string>  => {
+  const fetchToken = useCallback(async (): Promise<string>  => {
     setLoading(true);
-    setTokError(null);
+    setError(null);
 
     try {
       if (!verifier) {
         throw new Error('Code verifier not found in localStorage');
       }
   
-      const result: SpotifyTokenResponse = await getSpotifyToken(code, verifier);
+      const result: SpotifyTokenResponse = await spotifyApi.getToken(code, verifier);
       setToken(result.access_token);
       
-      console.log('Token received successfully!');
       return result.access_token;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to get token';
-      setTokError(errorMessage);
+      setError(errorMessage);
       console.error('Token request failed:', errorMessage);
       throw err;
     } finally {
@@ -39,14 +39,14 @@ function useGetToken(code: string) {
 
   const clearToken = useCallback(() => {
     setToken(null);
-    setTokError(null);
+    setError(null);
   }, []);
 
   return { 
     token, 
     loading, 
-    tokError, 
-    getToken, 
+    error, 
+    fetchToken, 
     clearToken 
   };
 }

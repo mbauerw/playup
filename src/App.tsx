@@ -4,6 +4,7 @@ import useGetToken from './hooks/useGetToken'
 import useGetArtistData from './hooks/useGetArtistData'
 import usePkceAuth from './hooks/usePkceAuth'
 import useGetProfile from './hooks/useGetProfile'
+import useGetCurrentUserPlaylists from './hooks/playlists/useGetCurrentUserPlaylists'
 
 interface SpotifyTokenResponse {
   access_token: string;
@@ -12,16 +13,15 @@ interface SpotifyTokenResponse {
 }
 
 function App() {
-  const [count, setCount] = useState(0);
-
+  // const scope = 'user-read-private user-read-email playlist-read-private';
   // pkce vars
   const {code, isLoading, error, initiateAuth, clearAuth} = usePkceAuth();
 
   // token vars
-  const {token, loading, tokError, getToken, clearToken} = useGetToken(code);
-  const [fullResponse, setFullResponse] = useState<SpotifyTokenResponse | null>(null);
+  const {token, loading, error: tokError, fetchToken, clearToken} = useGetToken(code);  
   
-  
+  // playlist vars
+  const {playlists, loading: playlistsLoading, error: playlistsError, fetchCurrentUserPlaylists} = useGetCurrentUserPlaylists(token);
 
   // artist direct vars
   const aMonkey = "7Ln80lUS6He07XvHI8qqHH?si=STCSgHE_RMScHZiuYI53VA"
@@ -48,7 +48,7 @@ function App() {
   const handleGetPkce = async () => {
     try {
       initiateAuth();
-      console.log('The Code is as follows: ', code);
+      //console.log('The Code is as follows: ', code);
 
     } catch (error){
       console.error('Failed to get Auth:', error);
@@ -57,8 +57,8 @@ function App() {
 
   const handleGetToken = async () => {
     try {
-      getToken();
-      console.log('We got them tokens', token);
+      fetchToken();
+      //console.log('We got them tokens', token);
     }
     catch (error){
       console.error('Failed to get Token:', error);
@@ -69,7 +69,7 @@ function App() {
     if (code){
       try {
         fetchProfile();
-        console.log("Heyyyo profile: " + JSON.stringify(profile));
+        //console.log("Heyyyo profile: " + JSON.stringify(profile));
       }
       catch (error){
         console.log(error);
@@ -78,12 +78,25 @@ function App() {
     
   }
 
+  const handleGetPlaylists = async () => {
+    if (!token){
+      console.log('No token available for playlists');
+      return;
+    }
+      try{
+        const result = await fetchCurrentUserPlaylists();
+        console.log('Playlists retrieved:', JSON.stringify(result));
+      } catch (error){
+        console.log('damn playlists', error);
+      }
+    }
+
+
   return (
     <div>
-      <p>Count: {count}</p>
       <p>Token: {token ? 'Token received' : 'No token'}</p>
       {tokError && <p style={{ color: 'red' }}>Error: {tokError}</p>}
-      {token && <p className='text-2xl text-white'> {JSON.stringify(fullResponse)}</p>}
+      {token && <p className='text-2xl text-white'> {JSON.stringify(token)}</p>}
       
       <button onClick={handleGetArtistData} disabled={loading || !token}>
         {loading ? 'Getting Artist Data...' : 'Get Artist Data'}
@@ -99,6 +112,10 @@ function App() {
 
       <button onClick={handleGetProfile} disabled={loading}>
         {loading ? 'Getting Profile...' : 'Get Profile'}
+      </button>
+
+      <button onClick={handleGetPlaylists} >
+        {playlistsLoading ? 'Getting Playlists...' : 'Get Playlist'}
       </button>
       
       <button onClick={handleClearToken} disabled={loading}>
@@ -122,6 +139,12 @@ function App() {
         <div>
           <h3>Artist Data:</h3>
           <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
+      )}
+      {playlists && (
+        <div>
+          <h3>PLAYLISTS:</h3>
+          <pre>{JSON.stringify(playlists, null, 2)}</pre>
         </div>
       )}
     </div>

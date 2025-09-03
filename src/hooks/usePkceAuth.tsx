@@ -21,16 +21,16 @@ const base64encode = (input: ArrayBuffer): string => {
     .replace(/\//g, '_');
 };
 
-
-
-const usePkceAuth = (): UsePkceAuthReturn => {
+const usePkceAuth = (
+  scope: string = 'user-read-private user-read-email playlist-read-private playlist-modify-private user-follow-read',
+  name: string = 'bob'
+): UsePkceAuthReturn => {
   const [code, setCode] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const clientId = import.meta.env.VITE_clientId;
   const redirectUri = 'http://127.0.0.1:5173/callback';
-  const scope = 'user-read-private user-read-email playlist-read-private playlist-modify-private user-follow-read';
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -41,6 +41,7 @@ const usePkceAuth = (): UsePkceAuthReturn => {
       setError(`Authentication failed: ${authError}`);
     } else if (authCode) {
       setCode(authCode);
+      console.log("Auth Code is: ", authCode);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);

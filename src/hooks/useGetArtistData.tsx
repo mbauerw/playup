@@ -1,13 +1,10 @@
 import {useState, useEffect, useCallback} from 'react';
+import type { Followers } from '../types/spotify';
 
 interface ExternalUrls {
   spotify: string;
 }
 
-interface Followers {
-  href: string | null;
-  total: number;
-}
 
 interface SpotifyImage {
   height: number;
